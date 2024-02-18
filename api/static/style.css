@@ -2545,8 +2545,8 @@ p {
     color: #7e7c87;
     background-color: rgba(0, 0, 0, .18);
     padding-top: 10px;
-    padding-bottom: 15px;
-    position: fixed;
+    padding-bottom:10px;
+    position: relative;
     bottom: 0;
     left: 0;
     right: 0;
@@ -2680,7 +2680,7 @@ p {
     background-color: #000;
     background-image: url("https://assets-global.website-files.com/65c33b7349bd8ea12a4e7e4e/65c35375ea7d8a225d35ff57_Image.png");
     background-repeat: no-repeat;
-    padding-top: 60px;
+    padding-top: 20px;
 }
 
 .select-field {
@@ -2771,10 +2771,10 @@ p {
     }
 
     .footer-section {
-        background-color: rgba(0, 0, 0, .49);
-        padding-top: 23px;
-        padding-bottom: 23px;
-        position: static;
+        background-color: rgba(0, 0, 0, .18);
+        padding-top: 10px;
+        padding-bottom: 10px;
+        position: relative;
     }
 
     .container {
