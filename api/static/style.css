@@ -131,6 +131,9 @@ html {
 
 body {
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 article,
@@ -399,6 +402,9 @@ body {
     font-family: Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
+    display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 }
 
 img {
@@ -2353,12 +2359,15 @@ body {
     color: #fff;
     text-align: center;
     background-color: #000;
-    background-image: url("https://assets-global.website-files.com/65c33b7349bd8ea12a4e7e4e/65c33b7349bd8ea12a4e7e89_fans-black.jpg");
+    background-image: url("https://assets-global.website-files.com/65c33b7349bd8ea12a4e7e4e/65c35375ea7d8a225d35ff57_Image.png");
     background-size: cover;
-    padding-top: 126px;
+    padding-top: 20px;
     font-family: Roboto Condensed, sans-serif;
     font-size: 14px;
     line-height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 h1 {
@@ -2681,6 +2690,9 @@ p {
     background-image: url("https://assets-global.website-files.com/65c33b7349bd8ea12a4e7e4e/65c35375ea7d8a225d35ff57_Image.png");
     background-repeat: no-repeat;
     padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .select-field {
@@ -2746,7 +2758,10 @@ p {
 
 @media screen and (max-width: 767px) {
     body {
-        padding-top: 65px;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .subtitle {
