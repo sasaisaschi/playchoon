@@ -2,7 +2,8 @@
   "dependencies": {
     "@nuxt/ui": "^2.13.0",
     "debug": "^4.3.4",
+    "depcheck": "^1.4.7",
     "uuid": "^9.0.1",
-    "vercel": "^33.2.0"
+    "vercel": "^32.3.0"
   }
 }
