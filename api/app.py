@@ -11,7 +11,8 @@ load_dotenv()
 app = Flask(__name__)
 # Use a secret key from environment or generate a random one
 app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
-CORS(app, resources={r"/*": {"origins": "https://playchoon.vercel.app"}})
+# Allow CORS for both production and development environments
+CORS(app, resources={r"/*": {"origins": ["https://playchoon.vercel.app", "http://localhost:8888", "http://localhost:5000"]}})
 
 # Get the base URL from environment or use a default
 base_url = os.environ.get('BASE_URL', 'https://playchoon.vercel.app')
@@ -101,4 +102,4 @@ def generate_playlist():
     return jsonify({'status': 'success', 'playlist_id': playlist['id']})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8888, debug=True)
