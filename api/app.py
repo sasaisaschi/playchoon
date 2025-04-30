@@ -11,10 +11,10 @@ load_dotenv()
 app = Flask(__name__)
 # Use a secret key from environment or generate a random one
 app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
-CORS(app, resources={r"/*": {"origins": "https://ts-playchoon.vercel.app"}})
+CORS(app, resources={r"/*": {"origins": "https://playchoon.vercel.app"}})
 
 # Get the base URL from environment or use a default
-base_url = os.environ.get('BASE_URL', 'https://ts-playchoon.vercel.app')
+base_url = os.environ.get('BASE_URL', 'https://playchoon.vercel.app')
 redirect_uri = f"{base_url}/callback"
 
 sp_oauth = SpotifyOAuth(client_id=os.environ.get('SPOTIFY_CLIENT_ID'),
