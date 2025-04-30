@@ -1,19 +1,25 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, session
 from flask_cors import CORS
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
 from dotenv import load_dotenv
-from flask import session
+
+# Load environment variables first
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'your secret key'  # Replace this with your own secret key
+# Use a secret key from environment or generate a random one
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
 CORS(app, resources={r"/*": {"origins": "https://ts-playchoon.vercel.app"}})
 
-load_dotenv()
+# Get the base URL from environment or use a default
+base_url = os.environ.get('BASE_URL', 'https://ts-playchoon.vercel.app')
+redirect_uri = f"{base_url}/callback"
+
 sp_oauth = SpotifyOAuth(client_id=os.environ.get('SPOTIFY_CLIENT_ID'),
                         client_secret=os.environ.get('SPOTIFY_CLIENT_SECRET'),
-                        redirect_uri="http://localhost:8888/callback",
+                        redirect_uri=redirect_uri,
                         scope="playlist-modify-public")
 
 @app.route('/')
@@ -56,14 +62,38 @@ def generate_playlist():
         sp = spotipy.Spotify(auth=token_info['access_token'])  # Erstellen Sie einen neuen authentifizierten Spotify-Client
         user_info = sp.current_user()
 
+    # Get data from request
+    data = request.get_json()
+    artist_names = data.get('artist_names', [])
+    total_songs_value = data.get('total_songs', 'First')  # Default to 'First' if not provided
+
+    # Map the dropdown values to actual numbers
+    total_songs_map = {
+        'First': 10,
+        'Second': 20,
+        'Third': 30
+    }
+    total_songs = total_songs_map.get(total_songs_value, 10)  # Default to 10 if value not in map
+
     spotify_username = user_info['id']
 
+    # Check if artist_names is not empty
+    if not artist_names:
+        return jsonify({'status': 'error', 'message': 'No artists provided'})
+
     songs_per_artist = total_songs // len(artist_names)
+    if songs_per_artist < 1:
+        songs_per_artist = 1  # Ensure at least one song per artist
+
     track_ids = []
 
     for artist in artist_names:
-        results = sp.search(q='artist:' + artist, type='track', limit=songs_per_artist)
-        track_ids += [track['id'] for track in results['tracks']['items']]
+        if artist.strip():  # Skip empty artist names
+            results = sp.search(q='artist:' + artist.strip(), type='track', limit=songs_per_artist)
+            track_ids += [track['id'] for track in results['tracks']['items']]
+
+    if not track_ids:
+        return jsonify({'status': 'error', 'message': 'No tracks found for the provided artists'})
 
     playlist = sp.user_playlist_create(user=spotify_username, name="PlayChoon Playlist")
     sp.playlist_add_items(playlist_id=playlist['id'], items=track_ids)
