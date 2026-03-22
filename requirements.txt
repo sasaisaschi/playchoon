@@ -1,7 +1,4 @@
 flask
 spotipy
-flask-wtf
-wtforms
 python-dotenv
-cors
 flask-cors

@@ -1,1 +1,5 @@
 .vercel
+.cache
+*.token
+__pycache__/
+*.pyc
