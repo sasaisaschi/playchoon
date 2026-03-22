@@ -205,7 +205,7 @@ flask-cors     # korrekt
 - [x] `flask-wtf` / `wtforms` bereits in Phase 1 entfernt – kein Handlungsbedarf
 - [x] jQuery-CDN und Webflow-Script aus `index.html` entfernt (beide ungenutzt)
 - [x] Fehlerbehandlung verfeinert: Server-Fehler werden abgefangen, benutzerfreundliche deutsche Fehlermeldungen zurückgegeben (`app.py`, `main.js`)
-- [x] **Bugfix:** `vercel dev` Recursive-Invocation-Error behoben – `"dev"` Script in `package.json` zeigt jetzt auf `python api/app.py` statt `vercel dev`
+- [x] **Bugfix:** `vercel dev` Recursive-Invocation-Error behoben – `"dev"` Script aus `package.json` entfernt. `vercel dev` direkt im Terminal aufrufen; ein `dev`-Script ist für dieses serverless Python-Projekt nicht sinnvoll.
 
 ### Phase 3 – Feature-Erweiterungen
 > Geplante Verbesserungen und neue Features
