@@ -186,14 +186,13 @@ flask-cors     # korrekt
 > Muss vor jeder weiteren Entwicklung erledigt werden
 
 - [x] **ERLEDIGT:** Spotify Credentials rotiert (2026-03-22) – neue `SPOTIFY_CLIENT_ID` und `SPOTIFY_CLIENT_SECRET` auf Vercel hinterlegen
-- [ ] `api/.cache` aus dem Repository entfernen: `git rm --cached api/.cache` → zu `api/.gitignore` hinzufügen
-- [ ] `api/.gitignore` um `.cache`, `*.token` erweitern
-- [ ] Typo `BAS_URL` → `BASE_URL` in `.env.local` (Zeile 3) korrigieren
-- [ ] `app.secret_key` aus Pflicht-Umgebungsvariable `SECRET_KEY` lesen – `os.urandom(24)`-Fallback entfernen (bricht Sessions auf Vercel Serverless bei jedem Cold Start)
-- [ ] `debug=True` in `app.py:105` auf Env-Variable umstellen: `debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'`
-- [ ] `cors` aus `requirements.txt:6` entfernen (kein gültiges PyPI-Paket für Flask)
-- [ ] `flask-wtf` und `wtforms` aus `requirements.txt` entfernen (ungenutzt, CSRF kein akutes Risiko wegen CORS-Einschränkung + JSON-Endpoint)
-- [ ] `@nuxt/ui`, `debug`, `uuid` aus `package.json` entfernen (ungenutzt)
+- [x] `api/.cache` aus dem Repository entfernt (`git rm --cached api/.cache`)
+- [x] `api/.gitignore` um `.cache`, `*.token`, `__pycache__/`, `*.pyc` erweitert
+- [x] Typo `BAS_URL` → `BASE_URL` in `.env.local` korrigiert, Zeile `BASE_URL=https://playchoon.vercel.app` ergänzt
+- [x] `app.secret_key` Fallback entfernt – `SECRET_KEY` ist jetzt Pflicht-Umgebungsvariable, App wirft `RuntimeError` wenn nicht gesetzt (`app.py:13-16`)
+- [x] `debug=True` ersetzt durch `os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'` (`app.py:108`)
+- [x] `cors` (falsches Paket) und `flask-wtf`, `wtforms` (ungenutzt) aus `requirements.txt` entfernt
+- [x] `@nuxt/ui`, `debug`, `uuid` aus `package.json` entfernt – `name`, `version`, `description`, `scripts` (`dev`, `deploy`, `preview`) ergänzt
 
 ### Phase 2 – Core-Verbesserungen
 > Architektur, Performance, Codequalität

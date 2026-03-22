@@ -1,8 +1,16 @@
 {
+  "name": "playchoon",
+  "version": "1.0.0",
+  "description": "Spotify Playlist Generator – generate personalized playlists based on your favorite artists",
+  "author": "TobisStudio",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "preview": "vercel"
+  },
   "dependencies": {
-    "@nuxt/ui": "^2.13.0",
-    "debug": "^4.3.4",
-    "uuid": "^9.0.1",
     "vercel": "^33.2.0"
   }
 }
