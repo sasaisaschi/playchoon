@@ -2,7 +2,7 @@
   "name": "playchoon",
   "version": "1.0.0",
   "description": "Spotify Playlist Generator – generate personalized playlists based on your favorite artists",
-  "author": "TobisStudio",
+  "author": "Sascha Riemenschneider",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -10,6 +10,9 @@
     "preview": "vercel"
   },
   "dependencies": {
-    "vercel": "^32.3.0"
+  },
+  "devDependencies": {
+    "stylelint": "^17.5.0",
+    "vercel": "^32.7.2"
   }
 }

@@ -2,9 +2,9 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon">
     <title>PlayChoon - Spotify Playlist Generator</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="../static/style.css" />
   </head>
   <body class="body">
     <div class="container w-container">
@@ -17,7 +17,7 @@
       </div>
       <div class="form-wrapper">
         <form id="playlist-form" class="form">
-          <input
+          <label for="Artists-Input"></label><input
             class="field w-input"
             maxlength="256"
             name="Artists-Input"
@@ -27,7 +27,7 @@
             id="Artists-Input"
             required=""
           />
-          <select
+          <label for="field-2"></label><select
             id="field-2"
             name="field-2"
             data-name="Field 2"
@@ -86,6 +86,6 @@
         </div>
       </div>
     </div>
-    <script src="/static/main.js"></script>
+    <script src="../static/main.js"></script>
   </body>
 </html>

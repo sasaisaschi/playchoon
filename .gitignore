@@ -15,3 +15,7 @@ env.bak/
 venv.bak/ 
 node_modules/
 .claude/
+
+.cache
+*.token
+__pycache__/
