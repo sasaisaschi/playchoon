@@ -1,6 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, render_template, request, jsonify, redirect, session
 from flask_cors import CORS
-import os
 
 from config import SECRET_KEY, CORS_ORIGINS, SONGS_MAP, MAX_ARTISTS, MAX_ARTIST_NAME_LENGTH
 from spotify_service import get_oauth, refresh_token_if_needed, build_playlist
