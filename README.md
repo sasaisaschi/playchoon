@@ -69,18 +69,31 @@ python api\app.py
 
 Running on
 ```bash
-http://127.0.0.1:5000
+http://127.0.0.1:8888
 ```
 
 ### Environment Variables
-To run this project locally, you will need to add the following environment variables to your .env file.
-
-`SPOTIFY_CLIENT_SECRET=`
+To run this project locally, you will need to add the following environment variables to your `.env` file.
 
 `SPOTIFY_CLIENT_ID=`
 
-Get your Spotify API credentials from [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications).
-Click on 'Create an App'. Pick an 'App Name' and 'App Description' of your choice and mark the checkboxes. After creation, you see your 'Client ID' and you can click on 'Show Client Secret` to unhide your 'Client Secret'. Use your 'Client ID' and 'Client Secret' to retrieve a token from the Spotify API.
+`SPOTIFY_CLIENT_SECRET=`
+
+`SECRET_KEY=`
+
+`BASE_URL=http://localhost:8888`
+
+**SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET** – Get your Spotify API credentials from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications). Click *Create an App*, enter a name and description, then copy your *Client ID* and *Client Secret*. Add `http://localhost:8888/callback` as a Redirect URI in the app settings.
+
+> ⚠️ **Note:** Spotify requires a **Premium subscription** on the developer account to access the Web API. Without Premium, playlist generation will be blocked by Spotify.
+
+**SECRET_KEY** – Any long random string used to sign Flask sessions. Example: `openssl rand -hex 32`
+
+**BASE_URL** – The base URL of the running app. Use `http://localhost:8888` locally, `https://playchoon.vercel.app` in production.
+
+#### Vercel Deployment
+Set the same four variables in your Vercel project:
+**Dashboard → playchoon → Settings → Environment Variables**
 
 ## Disclaimer
 
