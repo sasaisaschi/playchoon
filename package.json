@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "python api/app.py",
     "deploy": "vercel --prod",
     "preview": "vercel"
   },
