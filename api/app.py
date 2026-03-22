@@ -1,20 +1,46 @@
-import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, redirect, session
 from flask_cors import CORS
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
-from config import SECRET_KEY, CORS_ORIGINS, SONGS_MAP, MAX_ARTISTS, MAX_ARTIST_NAME_LENGTH
-from spotify_service import get_oauth, refresh_token_if_needed, build_playlist
+load_dotenv()
 
+# --- Config ---
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError('SECRET_KEY environment variable is not set')
+
+SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
+BASE_URL = os.environ.get('BASE_URL', 'https://playchoon.vercel.app')
+REDIRECT_URI = f"{BASE_URL}/callback"
+
+CORS_ORIGINS = [
+    'https://playchoon.vercel.app',
+    'http://localhost:8888',
+    'http://localhost:5000',
+]
+
+SONGS_MAP = {'First': 10, 'Second': 20, 'Third': 30}
+MAX_ARTISTS = 10
+MAX_ARTIST_NAME_LENGTH = 100
+
+# --- App ---
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 CORS(app, resources={r'/*': {'origins': CORS_ORIGINS}})
 
-sp_oauth = get_oauth()
+sp_oauth = SpotifyOAuth(
+    client_id=SPOTIFY_CLIENT_ID,
+    client_secret=SPOTIFY_CLIENT_SECRET,
+    redirect_uri=REDIRECT_URI,
+    scope='playlist-modify-public',
+)
 
 
+# --- Routes ---
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -44,17 +70,12 @@ def generate_playlist():
     artist_names = data.get('artist_names', [])
     total_songs_value = data.get('total_songs', 'First')
 
-    # Input-Validierung
+    artist_names = [a.strip() for a in artist_names if a.strip()]
+
     if not artist_names:
         return jsonify({'status': 'error', 'message': 'Bitte mindestens einen Künstler eingeben.'})
-
-    artist_names = [a for a in artist_names if a.strip()]
-    if not artist_names:
-        return jsonify({'status': 'error', 'message': 'Kein gültiger Künstlername gefunden.'})
-
     if len(artist_names) > MAX_ARTISTS:
         return jsonify({'status': 'error', 'message': f'Maximal {MAX_ARTISTS} Künstler erlaubt.'})
-
     if any(len(a) > MAX_ARTIST_NAME_LENGTH for a in artist_names):
         return jsonify({'status': 'error', 'message': 'Ein Künstlername ist zu lang (max. 100 Zeichen).'})
 
@@ -62,21 +83,33 @@ def generate_playlist():
     songs_per_artist = max(1, total_songs // len(artist_names))
 
     try:
-        sp, user_info, token_info = refresh_token_if_needed(sp_oauth, token_info)
-        session['token_info'] = token_info
-    except Exception:
-        session.pop('token_info', None)
-        return jsonify({'auth_url': sp_oauth.get_authorize_url()})
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        user_info = sp.current_user()
+    except spotipy.SpotifyException:
+        try:
+            token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+            session['token_info'] = token_info
+            sp = spotipy.Spotify(auth=token_info['access_token'])
+            user_info = sp.current_user()
+        except Exception:
+            session.pop('token_info', None)
+            return jsonify({'auth_url': sp_oauth.get_authorize_url()})
 
     try:
-        playlist_id, track_ids = build_playlist(sp, user_info['id'], artist_names, songs_per_artist)
-    except Exception as e:
+        track_ids = []
+        for artist in artist_names:
+            results = sp.search(q='artist:' + artist, type='track', limit=songs_per_artist)
+            track_ids += [track['id'] for track in results['tracks']['items']]
+
+        if not track_ids:
+            return jsonify({'status': 'error', 'message': 'Keine Tracks für die angegebenen Künstler gefunden.'})
+
+        playlist = sp.user_playlist_create(user=user_info['id'], name='PlayChoon Playlist')
+        sp.playlist_add_items(playlist_id=playlist['id'], items=track_ids)
+    except Exception:
         return jsonify({'status': 'error', 'message': 'Fehler bei der Spotify-Anfrage. Bitte versuche es erneut.'})
 
-    if not playlist_id:
-        return jsonify({'status': 'error', 'message': 'Keine Tracks für die angegebenen Künstler gefunden.'})
-
-    return jsonify({'status': 'success', 'playlist_id': playlist_id})
+    return jsonify({'status': 'success', 'playlist_id': playlist['id']})
 
 
 if __name__ == '__main__':
