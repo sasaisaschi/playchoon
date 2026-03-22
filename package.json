@@ -11,6 +11,6 @@
     "preview": "vercel"
   },
   "dependencies": {
-    "vercel": "^33.2.0"
+    "vercel": "^32.3.0"
   }
 }
