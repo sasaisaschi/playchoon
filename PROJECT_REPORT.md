@@ -128,16 +128,18 @@ playchoon/
 
 ### Kritische Sicherheitsprobleme
 
+> **Status:** Spotify API Credentials wurden am 2026-03-22 rotiert. Die alten Werte in `.env` (lokal, nicht getrackt) und `api/.cache` sind ungültig. Neue Credentials wurden im Spotify Developer Dashboard ausgestellt und als Umgebungsvariablen auf Vercel hinterlegt.
+
 | Priorität | Problem | Datei | Beschreibung |
 |---|---|---|---|
-| 🔴 KRITISCH | Echter API Secret im Repository | `.env` Zeile 1 | `SPOTIFY_CLIENT_SECRET=da8dccc6...` – echter Key commitet/vorhanden |
-| 🔴 KRITISCH | Spotify Token im Repository | `api/.cache` Zeile 1 | Vollständiges OAuth Token-Objekt (access + refresh token) liegt im Repo |
-| 🟠 HOCH | Typo in Env-Variable | `.env` Zeile 3, `.env.local` Zeile 3 | `BAS_URL` statt `BASE_URL` → `base_url` in `app.py:18` liest `BASE_URL`, Typo bleibt unbemerkt |
-| 🟠 HOCH | `os.urandom(24)` als Fallback-Secret | `app.py:13` | Bei jedem Serverstart wird ein neuer `secret_key` generiert → alle Sessions werden bei Neustart ungültig (Serverless!) |
-| 🟡 MITTEL | CSRF-Schutz fehlt | `app.py:48` | `flask-wtf` ist installiert (`requirements.txt`), aber nicht genutzt – `POST /generate_playlist` hat keinen CSRF-Token |
+| 🔴 KRITISCH | ~~Echter API Secret im Repository~~ | ~~`.env`~~ | **ERLEDIGT (2026-03-22):** `.env` war lokal vorhanden, aber laut git-Historie **nie getrackt** – kein echter Commit mit Credentials. Spotify Credentials wurden vorsorglich rotiert. |
+| 🔴 KRITISCH | Spotify Token im Repository | `api/.cache` Zeile 1 | Vollständiges OAuth Token-Objekt (access + refresh token) liegt im Repo – muss via `git rm --cached api/.cache` entfernt werden |
+| 🟠 HOCH | Typo in Env-Variable | `.env.local` Zeile 3 | `BAS_URL` statt `BASE_URL` → `base_url` in `app.py:18` liest `BASE_URL`, Variable bleibt leer/unbemerkt |
+| 🟠 HOCH | `os.urandom(24)` als Fallback-Secret | `app.py:13` | Bei jedem Serverless Cold Start wird ein neuer `secret_key` generiert → alle laufenden Sessions werden ungültig |
+| 🟡 MITTEL | CSRF – niedriges Restrisiko | `app.py:15, 67` | CORS auf 3 Domains begrenzt + Endpoint liest JSON (`request.get_json()`), kein klassischer CSRF-Pfad. `flask-wtf` trotzdem entfernen oder gezielt einsetzen. |
 | 🟡 MITTEL | Kein Input-Sanitizing | `app.py:93` | Künstlername wird ungefiltert in `sp.search(q='artist:' + artist.strip())` eingebaut – Injection in Spotify-Querys möglich |
-| 🟡 MITTEL | `debug=True` in Produktion | `app.py:105` | Flask läuft lokal mit `debug=True` – Debugger-PIN kann exponiert werden |
-| 🟢 NIEDRIG | `api/.cache` nicht in gitignore | `api/.gitignore` | Enthält nur `__pycache__` – Token-Cache-File wird nicht ignoriert |
+| 🟡 MITTEL | `debug=True` in Produktion | `app.py:105` | Flask läuft lokal mit `debug=True` – auf Env-Variable umstellen |
+| 🟢 NIEDRIG | `api/.cache` nicht in .gitignore | `api/.gitignore` | Enthält nur `__pycache__` – Token-Cache-File wird nicht ignoriert |
 
 ### Abhängigkeiten (requirements.txt)
 
@@ -183,15 +185,15 @@ flask-cors     # korrekt
 ### Phase 1 – Kritische Fixes & Stabilisierung
 > Muss vor jeder weiteren Entwicklung erledigt werden
 
-- [ ] **SOFORT:** `SPOTIFY_CLIENT_SECRET` und `SPOTIFY_CLIENT_ID` in `.env` als kompromittiert betrachten → neue Credentials im Spotify Developer Dashboard erstellen
-- [ ] **SOFORT:** `api/.cache` aus dem Repository entfernen (`git rm --cached api/.cache`) und zu `api/.gitignore` hinzufügen
-- [ ] `api/.gitignore` um `*.cache`, `.cache`, `*.token` erweitern
-- [ ] Typo `BAS_URL` → `BASE_URL` in `.env` (Zeile 3) und `.env.local` (Zeile 3) korrigieren
-- [ ] `app.secret_key` aus Umgebungsvariable `SECRET_KEY` pflichtmäßig machen – kein `os.urandom(24)` als Fallback (bricht Sessions auf Vercel Serverless)
-- [ ] `debug=True` in `app.py:105` entfernen oder auf Env-Variable umstellen: `debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'`
-- [ ] `cors` aus `requirements.txt:6` entfernen (falsches Paket)
-- [ ] `flask-wtf` und `wtforms` aus `requirements.txt` entfernen, solange sie nicht genutzt werden, oder CSRF-Schutz implementieren
-- [ ] `@nuxt/ui`, `debug`, `uuid` aus `package.json` entfernen
+- [x] **ERLEDIGT:** Spotify Credentials rotiert (2026-03-22) – neue `SPOTIFY_CLIENT_ID` und `SPOTIFY_CLIENT_SECRET` auf Vercel hinterlegen
+- [ ] `api/.cache` aus dem Repository entfernen: `git rm --cached api/.cache` → zu `api/.gitignore` hinzufügen
+- [ ] `api/.gitignore` um `.cache`, `*.token` erweitern
+- [ ] Typo `BAS_URL` → `BASE_URL` in `.env.local` (Zeile 3) korrigieren
+- [ ] `app.secret_key` aus Pflicht-Umgebungsvariable `SECRET_KEY` lesen – `os.urandom(24)`-Fallback entfernen (bricht Sessions auf Vercel Serverless bei jedem Cold Start)
+- [ ] `debug=True` in `app.py:105` auf Env-Variable umstellen: `debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'`
+- [ ] `cors` aus `requirements.txt:6` entfernen (kein gültiges PyPI-Paket für Flask)
+- [ ] `flask-wtf` und `wtforms` aus `requirements.txt` entfernen (ungenutzt, CSRF kein akutes Risiko wegen CORS-Einschränkung + JSON-Endpoint)
+- [ ] `@nuxt/ui`, `debug`, `uuid` aus `package.json` entfernen (ungenutzt)
 
 ### Phase 2 – Core-Verbesserungen
 > Architektur, Performance, Codequalität
@@ -201,7 +203,7 @@ flask-cors     # korrekt
 - [ ] `api/app.py` aufteilen: Routes in `routes.py`, Spotify-Logik in `spotify_service.py`, Config in `config.py`
 - [ ] Input-Validierung für Künstlernamen einbauen: maximale Länge, erlaubte Zeichen, maximale Anzahl Artists (z.B. max 10)
 - [ ] Loading-State im Frontend implementieren: Button nach Klick deaktivieren, Spinner anzeigen (`main.js`)
-- [ ] CSRF-Schutz via `flask-wtf` für `POST /generate_playlist` aktivieren oder auf JWT-basierte Absicherung wechseln
+- [ ] `flask-wtf` nur einbinden, wenn künftig Cookie-basierte Formularrouten hinzukommen – für den aktuellen JSON-Endpoint nicht notwendig
 - [ ] `jQuery` entweder aus `index.html` entfernen (wird nicht genutzt) oder in `main.js` verwenden
 - [ ] Webflow CDN-Abhängigkeiten (jQuery, Webflow-Script, SVG-Icons) durch Self-hosted oder lokale Alternativen ersetzen
 - [ ] Fehlerbehandlung in `app.py:generate_playlist` verfeinern: spezifische Spotify-Fehlercodes abfangen, benutzerfreundliche Meldungen zurückgeben
