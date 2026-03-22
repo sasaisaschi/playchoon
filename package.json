@@ -9,10 +9,8 @@
     "deploy": "vercel --prod",
     "preview": "vercel"
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "stylelint": "^17.5.0",
-    "vercel": "^32.7.2"
+    "vercel": "^32.3.0"
   }
 }
