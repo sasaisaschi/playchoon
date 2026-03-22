@@ -197,15 +197,15 @@ flask-cors     # korrekt
 ### Phase 2 – Core-Verbesserungen
 > Architektur, Performance, Codequalität
 
-- [ ] Alle Python-Abhängigkeiten mit fixen Versionen pinnen (`pip freeze > requirements.txt`) für reproduzierbare Builds
-- [ ] `SECRET_KEY` als Pflicht-Umgebungsvariable auf Vercel setzen (Vercel Dashboard → Environment Variables)
-- [ ] `api/app.py` aufteilen: Routes in `routes.py`, Spotify-Logik in `spotify_service.py`, Config in `config.py`
-- [ ] Input-Validierung für Künstlernamen einbauen: maximale Länge, erlaubte Zeichen, maximale Anzahl Artists (z.B. max 10)
-- [ ] Loading-State im Frontend implementieren: Button nach Klick deaktivieren, Spinner anzeigen (`main.js`)
-- [ ] `flask-wtf` nur einbinden, wenn künftig Cookie-basierte Formularrouten hinzukommen – für den aktuellen JSON-Endpoint nicht notwendig
-- [ ] `jQuery` entweder aus `index.html` entfernen (wird nicht genutzt) oder in `main.js` verwenden
-- [ ] Webflow CDN-Abhängigkeiten (jQuery, Webflow-Script, SVG-Icons) durch Self-hosted oder lokale Alternativen ersetzen
-- [ ] Fehlerbehandlung in `app.py:generate_playlist` verfeinern: spezifische Spotify-Fehlercodes abfangen, benutzerfreundliche Meldungen zurückgeben
+- [x] Python-Abhängigkeiten mit fixen Versionen gepinnt: `flask==3.0.3`, `spotipy==2.23.0`, `python-dotenv==1.0.1`, `flask-cors==4.0.1`
+- [x] `SECRET_KEY` als Pflicht-Umgebungsvariable gesetzt (Vercel Dashboard – durch Nutzer erledigt)
+- [x] `api/app.py` aufgeteilt in `api/config.py` (Konfiguration), `api/spotify_service.py` (Spotify-Logik), `api/app.py` (Routes + App-Factory)
+- [x] Input-Validierung eingebaut: leere Names gefiltert, max. 10 Artists, max. 100 Zeichen pro Name (`app.py:38-54`, `config.py:21-23`)
+- [x] Loading-State implementiert: Button deaktiviert + „Loading..." während Fetch-Request (`main.js:setLoading`)
+- [x] `flask-wtf` / `wtforms` bereits in Phase 1 entfernt – kein Handlungsbedarf
+- [x] jQuery-CDN und Webflow-Script aus `index.html` entfernt (beide ungenutzt)
+- [x] Fehlerbehandlung verfeinert: Server-Fehler werden abgefangen, benutzerfreundliche deutsche Fehlermeldungen zurückgegeben (`app.py`, `main.js`)
+- [x] **Bugfix:** `vercel dev` Recursive-Invocation-Error behoben – `"dev"` Script in `package.json` zeigt jetzt auf `python api/app.py` statt `vercel dev`
 
 ### Phase 3 – Feature-Erweiterungen
 > Geplante Verbesserungen und neue Features
