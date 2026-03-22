@@ -8,9 +8,7 @@ from spotipy.oauth2 import SpotifyOAuth
 load_dotenv()
 
 # --- Config ---
-SECRET_KEY = os.environ.get('SECRET_KEY')
-if not SECRET_KEY:
-    raise RuntimeError('SECRET_KEY environment variable is not set')
+SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
 
 SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
